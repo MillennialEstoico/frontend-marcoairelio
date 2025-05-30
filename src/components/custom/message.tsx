@@ -2,7 +2,6 @@
 // import { motion, AnimatePresence } from 'framer-motion';
 import { motion } from 'framer-motion';
 import { cx } from 'classix';
-import { SparklesIcon } from './icons';
 import { Markdown } from './markdown';
 import { message } from "../../interfaces/interfaces"
 import { MessageActions } from '@/components/custom/actions';
