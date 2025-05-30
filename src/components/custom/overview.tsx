@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { MessageCircle, BotIcon } from 'lucide-react';
 
 export const Overview = () => {
   return (
@@ -14,14 +13,16 @@ export const Overview = () => {
     >
       <div className="rounded-xl p-6 flex flex-col gap-8 leading-relaxed text-center max-w-xl">
         <p className="flex flex-row justify-center gap-4 items-center">
-          <BotIcon size={44}/>
-          <span>+</span>
-          <MessageCircle size={44}/>
+          <img
+            src="/avatar/millennial.png"
+            alt="Millennial Estoico"
+            className="size-20 rounded-full ring-1 ring-border object-cover"
+          />
         </p>
         <p>
-          Welcome to <strong>chatbot-ui</strong><br />
-          a open source template made by<br />
-          <strong>Leon Binder</strong> and <strong>Christoph Handschuh</strong>.
+          ¡Hey! Soy <strong>Millennial Estoico </strong><br />
+          Estoy aquí para escucharte, ayudarte a pensar con claridad o simplemente charlar <strong>sin juicio</strong>.  
+          ¿Tienes algo en mente o empezamos con algo random?
         </p>
       </div>
     </motion.div>

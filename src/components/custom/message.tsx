@@ -22,9 +22,11 @@ export const PreviewMessage = ({ message }: { message: message; }) => {
         )}
       >
         {message.role === 'assistant' && (
-          <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border">
-            <SparklesIcon size={14} />
-          </div>
+          <img
+            src="/avatar/millennial.png"
+            alt="Millennial Estoico"
+            className="size-8 rounded-full ring-1 ring-border object-cover"
+          />
         )}
 
         <div className="flex flex-col w-full">
@@ -59,9 +61,11 @@ export const ThinkingMessage = () => {
           'group-data-[role=user]/message:bg-muted'
         )}
       >
-        <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border">
-          <SparklesIcon size={14} />
-        </div>
+        <img
+            src="/avatar/millennial.png"
+            alt="Millennial Estoico"
+            className="size-8 rounded-full ring-1 ring-border object-cover"
+          />
       </div>
     </motion.div>
   );
