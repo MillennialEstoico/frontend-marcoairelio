@@ -68,16 +68,24 @@ export function Chat() {
   return (
     <div className="flex flex-col min-w-0 h-dvh bg-background">
       <Header />
-      <div className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4" ref={messagesContainerRef}>
-        {messages.length === 0 && <Overview />}
-        {messages.map((message, index) => (
-          <PreviewMessage key={index} message={message} />
-        ))}
-        {isLoading && <ThinkingMessage />}
-        <div ref={messagesEndRef} className="shrink-0 min-w-[24px] min-h-[24px]" />
+      
+      {/* Contenedor de mensajes con altura fija */}
+      <div className="flex-1 overflow-hidden">
+        <div 
+          className="flex flex-col min-w-0 gap-6 h-full overflow-y-auto pt-4 pb-4" 
+          ref={messagesContainerRef}
+        >
+          {messages.length === 0 && <Overview />}
+          {messages.map((message, index) => (
+            <PreviewMessage key={index} message={message} />
+          ))}
+          {isLoading && <ThinkingMessage />}
+          <div ref={messagesEndRef} className="shrink-0 min-w-[24px] min-h-[24px]" />
+        </div>
       </div>
-      <div className="sticky bottom-0 z-10 w-full bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60
-             border-t px-4 pb-4 md:pb-6 mx-auto gap-2 md:max-w-3xl">
+
+      {/* ChatInput fijo en la parte inferior */}
+      <div className="sticky bottom-0 flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl border-t border-border/10">
         <ChatInput
           question={question}
           setQuestion={setQuestion}
