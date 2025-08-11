@@ -32,7 +32,7 @@ export const ChatInput = ({ question, setQuestion, onSubmit, isLoading }: ChatIn
     return (
         <div className="relative w-full flex flex-col gap-4">
             {showSuggestions && (
-                <div className="hidden md:grid sm:grid-cols-2 gap-2 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full px-2 sm:px-0">
                     {suggestedActions.map((suggestedAction, index) => (
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -40,7 +40,7 @@ export const ChatInput = ({ question, setQuestion, onSubmit, isLoading }: ChatIn
                             exit={{ opacity: 0, y: 20 }}
                             transition={{ delay: 0.05 * index }}
                             key={index}
-                            className={index > 1 ? 'hidden sm:block' : 'block'}
+                            className="block"
                         >
                             <Button
                                 variant="ghost"
@@ -49,10 +49,12 @@ export const ChatInput = ({ question, setQuestion, onSubmit, isLoading }: ChatIn
                                     onSubmit(text);
                                     setShowSuggestions(false);
                                 }}
-                                className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start"
+                                className="text-left border rounded-xl px-3 py-3 sm:px-4 sm:py-3.5 text-xs sm:text-sm flex-1 gap-1 flex-col w-full h-auto justify-start items-start min-h-[60px] sm:min-h-[auto]"
                             >
-                                <span className="font-medium">{suggestedAction.title}</span>
-                                <span className="text-muted-foreground">
+                                <span className="font-medium text-left w-full leading-tight">
+                                    {suggestedAction.title}
+                                </span>
+                                <span className="text-muted-foreground text-left w-full leading-tight">
                                     {suggestedAction.label}
                                 </span>
                             </Button>
