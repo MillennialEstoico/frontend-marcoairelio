@@ -32,7 +32,7 @@ export const ChatInput = ({ question, setQuestion, onSubmit, isLoading }: ChatIn
     return (
         <div className="relative w-full flex flex-col gap-4">
             {showSuggestions && (
-                <div className="hidden md:grid sm:grid-cols-2 gap-2 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full">
                     {suggestedActions.map((suggestedAction, index) => (
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
