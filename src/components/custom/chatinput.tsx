@@ -1,100 +1,103 @@
-import { ChatInput } from "@/components/custom/chatinput";
-import { PreviewMessage, ThinkingMessage } from "../../components/custom/message";
-import { useScrollToBottom } from '@/components/custom/use-scroll-to-bottom';
-// import { useState, useRef, useEffect } from "react";
-import { useState } from "react";
-import { message } from "../../interfaces/interfaces";
-import { Overview } from "@/components/custom/overview";
-import { Header } from "@/components/custom/header";
-import { v4 as uuidv4 } from 'uuid';
+import { Textarea } from "../ui/textarea";
+import { cx } from 'classix';
+import { Button } from "../ui/button";
+import { ArrowUpIcon } from "./icons"
+import { toast } from 'sonner';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
 
-const getOrCreateUserId = () => {
-  const storedId = localStorage.getItem("chat_user_id");
-  if (storedId) return storedId;
+interface ChatInputProps {
+    question: string;
+    setQuestion: (question: string) => void;
+    onSubmit: (text?: string) => void;
+    isLoading: boolean;
+}
 
-  const newId = uuidv4();
-  localStorage.setItem("chat_user_id", newId);
-  return newId;
-};
+const suggestedActions = [
+    {
+        title: 'Necesito consejo',
+        label: 'sobre una situación que me tiene dándole vueltas',
+        action: 'Necesito consejo sobre una situación que me tiene dándole vueltas',
+    },
+    {
+        title: 'Quiero subir el ánimo',
+        label: 'algo que me saque una sonrisa o me dé un empujón',
+        action: 'Quiero subir el ánimo algo que me saque una sonrisa o me dé un empujón',
+    },
+];
 
-const userId = getOrCreateUserId();
+export const ChatInput = ({ question, setQuestion, onSubmit, isLoading }: ChatInputProps) => {
+    const [showSuggestions, setShowSuggestions] = useState(true);
 
-export function Chat() {
-  const [messagesContainerRef, messagesEndRef] = useScrollToBottom<HTMLDivElement>();
-  const [messages, setMessages] = useState<message[]>([]);
-  const [question, setQuestion] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+    return (
+        <div className="relative w-full flex flex-col gap-4">
+            {showSuggestions && (
+                <div className="hidden md:grid sm:grid-cols-2 gap-2 w-full">
+                    {suggestedActions.map((suggestedAction, index) => (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                            transition={{ delay: 0.05 * index }}
+                            key={index}
+                            className={index > 1 ? 'hidden sm:block' : 'block'}
+                        >
+                            <Button
+                                variant="ghost"
+                                onClick={() => {
+                                    const text = suggestedAction.action;
+                                    onSubmit(text);
+                                    setShowSuggestions(false);
+                                }}
+                                className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start"
+                            >
+                                <span className="font-medium">{suggestedAction.title}</span>
+                                <span className="text-muted-foreground">
+                                    {suggestedAction.label}
+                                </span>
+                            </Button>
+                        </motion.div>
+                    ))}
+                </div>
+            )}
+            <input
+                type="file"
+                className="fixed -top-4 -left-4 size-0.5 opacity-0 pointer-events-none"
+                multiple
+                tabIndex={-1}
+            />
 
-  async function handleSubmit(text?: string) {
-    if (isLoading) return;
+            <Textarea
+                placeholder="Envía un mensaje..."
+                className={cx(
+                    'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-xl text-base bg-muted',
+                )}
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                onKeyDown={(event) => {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                        event.preventDefault();
 
-    const messageText = text || question;
-    setIsLoading(true);
-    const traceId = uuidv4();
+                        if (isLoading) {
+                            toast.error('Please wait for the model to finish its response!');
+                        } else {
+                            setShowSuggestions(false);
+                            onSubmit();
+                        }
+                    }
+                }}
+                rows={3}
+                autoFocus
+            />
 
-    setMessages(prev => [...prev, { content: messageText, role: "user", id: traceId }]);
-    setQuestion("");
-    const hostUrl = import.meta.env.VITE_BACKEND_URL;
-    try {
-      const response = await fetch(hostUrl + "/chat/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          user_id: userId,
-          content: messageText
-        })
-      });
+            <Button
+                className="rounded-full p-2 h-fit absolute bottom-2 right-2 m-1 bg-indigo-700 text-white hover:bg-purple-800 transition shadow-md disabled:opacity-50"
+                onClick={() => onSubmit(question)}
+                disabled={question.length === 0}
+            >
+                <ArrowUpIcon size={16} />
+            </Button>
 
-      if (!response.ok) {
-        throw new Error("Error al comunicarse con el backend. Host: " +hostUrl);
-      }
-
-      const data = await response.json();
-
-      setMessages(prev => [...prev, {
-        content: data.response,
-        role: "assistant",
-        id: uuidv4()
-      }]);
-    } catch (error) {
-      console.error("Error en fetch:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  return (
-    <div className="flex flex-col min-w-0 h-dvh bg-background">
-      <Header />
-      
-      {/* Contenedor de mensajes con altura fija y padding bottom para el input */}
-      <div className="flex-1 overflow-hidden">
-        <div 
-          className="flex flex-col min-w-0 gap-6 h-full overflow-y-auto pt-4 pb-20 md:pb-24" 
-          ref={messagesContainerRef}
-        >
-          {messages.length === 0 && <Overview />}
-          {messages.map((message, index) => (
-            <PreviewMessage key={index} message={message} />
-          ))}
-          {isLoading && <ThinkingMessage />}
-          <div ref={messagesEndRef} className="shrink-0 min-w-[24px] min-h-[24px]" />
         </div>
-      </div>
-
-      {/* ChatInput fijo en la parte inferior usando fixed */}
-      <div className="fixed bottom-0 left-0 right-0 flex justify-center px-4 bg-background pb-4 md:pb-6 border-t border-border/10 touch-none z-10">
-        <div className="w-full max-w-3xl touch-auto">
-          <ChatInput
-            question={question}
-            setQuestion={setQuestion}
-            onSubmit={handleSubmit}
-            isLoading={isLoading}
-          />
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
